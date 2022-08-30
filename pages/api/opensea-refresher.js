@@ -26,7 +26,7 @@ export default async function handler(req, res) {
 
     const browser = await chromium.puppeteer.launch({
       args: chromium.args,
-      path,
+      executablePath: await chromium.executablePath,
       headless: true,
       ignoreHTTPSErrors: true,
       ignoreDefaultArgs: ['--disable-extensions']
