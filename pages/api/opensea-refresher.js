@@ -33,12 +33,13 @@ export default async function handler(req, res) {
     )
 
     await pause(1000)
-    await page.click('[value="refresh"]')
+    // await page.click('[value="refresh"]')
+    const title = await page.title()
 
     console.log(`Token ${tokenId} finished and ready to close browser...`)
     browser.close()
 
-    res.status(200).json({ message: 'Ok' })
+    res.status(200).json({ message: 'Ok', title })
   } catch (error) {
     console.dir(error)
     res.status(500).json({ message: `Something went wrong! ${error}` })
