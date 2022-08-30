@@ -1,4 +1,4 @@
-const puppeteer = require('puppeteer-core')
+// const puppeteer = require('puppeteer-core')
 const chromium = require('chrome-aws-lambda')
 
 function pause(ms) {
@@ -23,29 +23,32 @@ export default async function handler(req, res) {
 
     console.log('Launching new page...')
     const page = await browser.newPage()
+    await page.setUserAgent(
+      'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/104.0.0.0 Safari/537.36'
+    )
 
     console.log('Going to Opensea...')
     await page.goto(
-      `https://testnets.opensea.io/assets/rinkeby/${contractAddress}/${tokenId}`
+      `https://testnets.opensea.io/assets/rinkeby/${contractAddress}`
     )
 
     // console.log('Wait 1 sec...')
-    await pause(1000)
+    // await pause(1000)
     // await page.waitForSelector('[value="refresh"]')
 
-    await page.click('[value="refresh"]')
+    // await page.click('[value="refresh"]')
     // console.log('Clicked refresh')
 
     // console.log('Taking screenshot...')
     // await page.screenshot({ path: 'example.png' })
-    // await page.screenshot({ type: 'png' })
+    const title = await page.title()
 
     console.log(`Token ${tokenId} finished and ready to close browser...`)
     browser.close()
 
-    res.status(200).json({ message: `TokenID ${tokenId} finished` })
+    res.status(200).json({ message: `TokenID ${tokenId} finished`, title })
   } catch (error) {
     console.dir(error)
-    res.status(500).json({ message: `Something went wrong! Error: ${error}` })
+    res.status(500).json({ message: `Something went wrong! ${error}` })
   }
 }
