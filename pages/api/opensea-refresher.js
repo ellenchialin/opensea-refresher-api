@@ -10,19 +10,19 @@ export default async function handler(req, res) {
     const contractAddress = req.body.contractAddress
     const tokenId = req.body.tokenId
 
-    const path =
-      process.env.NODE_ENV === 'dev'
-        ? {
-            executablePath:
-              process.platform === 'win32'
-                ? 'C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe'
-                : process.platform === 'linux'
-                ? '/usr/bin/google-chrome'
-                : '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'
-          }
-        : {
-            executablePath: await chromium.executablePath
-          }
+    // const path =
+    //   process.env.NODE_ENV === 'dev'
+    //     ? {
+    //         executablePath:
+    //           process.platform === 'win32'
+    //             ? 'C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe'
+    //             : process.platform === 'linux'
+    //             ? '/usr/bin/google-chrome'
+    //             : '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'
+    //       }
+    //     : {
+    //         executablePath: await chromium.executablePath
+    //       }
 
     const browser = await chromium.puppeteer.launch({
       args: chromium.args,
@@ -45,13 +45,13 @@ export default async function handler(req, res) {
       )
 
       await pause(1000)
-      // await page.click('[value="refresh"]')
-      const title = await page.title()
+      await page.click('[value="refresh"]')
+      // const title = await page.title()
 
       console.log(`Token ${tokenId} finished and ready to close browser...`)
       browser.close()
 
-      res.status(200).json({ message: 'Ok', title })
+      res.status(200).json({ message: `Token ${tokenId} finished` })
     } catch (error) {
       console.dir(error)
       res.status(500).json({ message: `Something went wrong! ${error}` })
