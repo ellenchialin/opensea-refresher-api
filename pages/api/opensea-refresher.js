@@ -31,7 +31,7 @@ export default async function handler(req, res) {
 
     // console.log('Wait 1 sec...')
     await pause(1000)
-    await page.waitForSelector('[value="refresh"]')
+    // await page.waitForSelector('[value="refresh"]')
 
     await page.click('[value="refresh"]')
     // console.log('Clicked refresh')
