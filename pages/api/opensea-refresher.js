@@ -1,4 +1,3 @@
-// const puppeteer = require('puppeteer-core')
 const chromium = require('chrome-aws-lambda')
 
 function pause(ms) {
@@ -7,42 +6,38 @@ function pause(ms) {
 
 export default async function handler(req, res) {
   if (req.method === 'POST') {
-    const contractAddress = req.body.contractAddress
-    const tokenId = req.body.tokenId
-
-    // const path =
-    //   process.env.NODE_ENV === 'dev'
-    //     ? {
-    //         executablePath:
-    //           process.platform === 'win32'
-    //             ? 'C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe'
-    //             : process.platform === 'linux'
-    //             ? '/usr/bin/google-chrome'
-    //             : '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'
-    //       }
-    //     : {
-    //         executablePath: await chromium.executablePath
-    //       }
-
-    const browser = await chromium.puppeteer.launch({
-      args: chromium.args,
-      executablePath: await chromium.executablePath,
-      headless: true,
-      ignoreHTTPSErrors: true,
-      ignoreDefaultArgs: ['--disable-extensions']
-    })
-
-    console.log('Launching new page...')
-    const page = await browser.newPage()
-    await page.setUserAgent(
-      'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/104.0.0.0 Safari/537.36'
-    )
+    const { contractAddress, tokenId } = req.body
+    const isTestnets = req.body.isTestnets === 'true'
+    const isERC = req.body.isERC === 'true'
 
     try {
-      console.log('Going to Opensea...')
-      await page.goto(
-        `https://testnets.opensea.io/assets/rinkeby/${contractAddress}/${tokenId}`
+      const browser = await chromium.puppeteer.launch({
+        args: chromium.args,
+        executablePath: await chromium.executablePath,
+        headless: true,
+        ignoreHTTPSErrors: true,
+        ignoreDefaultArgs: ['--disable-extensions']
+      })
+
+      console.log('Launching new page...')
+      const page = await browser.newPage()
+      await page.setUserAgent(
+        'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/104.0.0.0 Safari/537.36'
       )
+
+      if (isTestnets) {
+        console.log('Going to Opensea testnets...')
+        await page.goto(
+          `https://testnets.opensea.io/assets/rinkeby/${contractAddress}/${tokenId}`
+        )
+      } else {
+        console.log('Going to Opensea...')
+        await page.goto(
+          `https://opensea.io/assets/${
+            isERC ? 'ethereum/' : 'matic/'
+          }${contractAddress}/${tokenId}`
+        )
+      }
 
       await pause(1000)
       await page.click('[value="refresh"]')
@@ -54,11 +49,9 @@ export default async function handler(req, res) {
       res.status(200).json({ message: `Token ${tokenId} finished` })
     } catch (error) {
       console.dir(error)
-      res.status(500).json({ message: `Something went wrong! ${error}` })
+      res.status(500).send({ error: `Something went wrong! ${error}` })
     }
   } else {
-    res
-      .status(500)
-      .json({ message: 'Please use POST method to call this refresh api' })
+    res.status(500).send({ error: 'Please use POST method to call this api' })
   }
 }
