@@ -47,14 +47,20 @@ export default async function handler(req, res) {
       if (isTestnets) {
         console.log('Going to Opensea testnets...')
         await page.goto(
-          `https://testnets.opensea.io/assets/rinkeby/${contractAddress}/${tokenId}`
+          `https://testnets.opensea.io/assets/rinkeby/${contractAddress}/${tokenId}`,
+          {
+            waitUntil: 'networkidle0'
+          }
         )
       } else {
         console.log('Going to Opensea...')
         await page.goto(
           `https://opensea.io/assets/${
             isERC ? 'ethereum/' : 'matic/'
-          }${contractAddress}/${tokenId}`
+          }${contractAddress}/${tokenId}`,
+          {
+            waitUntil: 'networkidle0'
+          }
         )
       }
 
