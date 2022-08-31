@@ -1,10 +1,29 @@
 const chromium = require('chrome-aws-lambda')
+const Cors = require('cors')
+
+const cors = Cors({
+  methods: ['POST', 'GET']
+})
+
+function runMiddleware(req, res, fn) {
+  return new Promise((resolve, reject) => {
+    fn(req, res, (result) => {
+      if (result instanceof Error) {
+        return reject(result)
+      }
+
+      return resolve(result)
+    })
+  })
+}
 
 function pause(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms))
 }
 
 export default async function handler(req, res) {
+  await runMiddleware(req, res, cors)
+
   if (req.method === 'POST') {
     const { contractAddress, tokenId } = req.body
     const isTestnets = req.body.isTestnets === 'true'
