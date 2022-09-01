@@ -17,9 +17,9 @@ function runMiddleware(req, res, fn) {
   })
 }
 
-function pause(ms) {
-  return new Promise((resolve) => setTimeout(resolve, ms))
-}
+// function pause(ms) {
+//   return new Promise((resolve) => setTimeout(resolve, ms))
+// }
 
 export default async function handler(req, res) {
   await runMiddleware(req, res, cors)
@@ -75,12 +75,14 @@ export default async function handler(req, res) {
 
       const statusCode = pageResponse.status()
       if (statusCode === 400 || statusCode === 404) {
-        return res.status(404).json({
-          error:
+        return res
+          .status(404)
+          .send(
             'The NFT page does not exist. Please check contract address and token Id.'
-        })
+          )
       }
 
+      // await page.waitForSelector('[value="refresh"]');
       // await page.click('[value="refresh"]')
       const title = await page.title()
 
@@ -92,9 +94,9 @@ export default async function handler(req, res) {
         .json({ message: `Token ${tokenId} finished`, title })
     } catch (error) {
       console.dir(error)
-      res.status(500).send({ error: `Something went wrong! ${error}` })
+      return res.status(500).send(`Something went wrong! ${error}`)
     }
   } else {
-    res.status(500).send({ error: 'Please use POST method to call this api' })
+    return res.status(400).send('Please use POST method to call this api')
   }
 }
