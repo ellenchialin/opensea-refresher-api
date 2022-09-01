@@ -42,18 +42,20 @@ export default async function handler(req, res) {
         'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/104.0.0.0 Safari/537.36'
       )
 
-      page.on('response', (response) => {
-        if (response.status() == 404 || response.status() == 400) {
-          return res.status(404).json({
-            error:
-              'The NFT page does not exist. Please check contract address and token Id.'
-          })
-        }
-      })
+      // page.on('response', (response) => {
+      //   if (response.status() == 404 || response.status() == 400) {
+      //     return res.status(404).json({
+      //       error:
+      //         'The NFT page does not exist. Please check contract address and token Id.'
+      //     })
+      //   }
+      // })
+
+      let pageResponse
 
       if (isMainnet === 'true') {
         console.log('Going to Opensea...')
-        await page.goto(
+        pageResponse = await page.goto(
           `https://opensea.io/assets/${
             nftNetwork === 'ethereum' ? 'ethereum/' : 'matic/'
           }${contractAddress}/${tokenId}`,
@@ -63,12 +65,20 @@ export default async function handler(req, res) {
         )
       } else {
         console.log('Going to Opensea testnets...')
-        await page.goto(
+        pageResponse = await page.goto(
           `https://testnets.opensea.io/assets/rinkeby/${contractAddress}/${tokenId}`,
           {
             waitUntil: 'networkidle0'
           }
         )
+      }
+
+      const statusCode = pageResponse.status()
+      if (statusCode === 400 || statusCode === 404) {
+        return res.status(404).json({
+          error:
+            'The NFT page does not exist. Please check contract address and token Id.'
+        })
       }
 
       // await page.click('[value="refresh"]')
