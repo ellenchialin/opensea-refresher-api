@@ -44,7 +44,7 @@ export default async function handler(req, res) {
 
       page.on('response', (response) => {
         if (response.status() == 404 || response.status() == 400) {
-          res.status(404).json({
+          return res.status(404).json({
             error:
               'The NFT page does not exist. Please check contract address and token Id.'
           })
@@ -77,7 +77,9 @@ export default async function handler(req, res) {
       console.log(`Token ${tokenId} finished and ready to close browser...`)
       browser.close()
 
-      res.status(200).json({ message: `Token ${tokenId} finished`, title })
+      return res
+        .status(200)
+        .json({ message: `Token ${tokenId} finished`, title })
     } catch (error) {
       console.dir(error)
       res.status(500).send({ error: `Something went wrong! ${error}` })
