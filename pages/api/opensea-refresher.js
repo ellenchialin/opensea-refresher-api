@@ -25,9 +25,7 @@ export default async function handler(req, res) {
   await runMiddleware(req, res, cors)
 
   if (req.method === 'POST') {
-    const { contractAddress, tokenId } = req.body
-    const isTestnets = req.body.isTestnets === 'true'
-    const isERC = req.body.isERC === 'true'
+    const { contractAddress, isMainnet, nftNetwork, tokenId } = req.body
 
     try {
       const browser = await chromium.puppeteer.launch({
@@ -53,20 +51,20 @@ export default async function handler(req, res) {
         }
       })
 
-      if (isTestnets) {
-        console.log('Going to Opensea testnets...')
+      if (isMainnet === 'true') {
+        console.log('Going to Opensea...')
         await page.goto(
-          `https://testnets.opensea.io/assets/rinkeby/${contractAddress}/${tokenId}`,
+          `https://opensea.io/assets/${
+            nftNetwork === 'ethereum' ? 'ethereum/' : 'matic/'
+          }${contractAddress}/${tokenId}`,
           {
             waitUntil: 'networkidle0'
           }
         )
       } else {
-        console.log('Going to Opensea...')
+        console.log('Going to Opensea testnets...')
         await page.goto(
-          `https://opensea.io/assets/${
-            isERC ? 'ethereum/' : 'matic/'
-          }${contractAddress}/${tokenId}`,
+          `https://testnets.opensea.io/assets/rinkeby/${contractAddress}/${tokenId}`,
           {
             waitUntil: 'networkidle0'
           }
