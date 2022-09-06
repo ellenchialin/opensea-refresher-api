@@ -53,7 +53,7 @@ export default async function handler(req, res) {
 
       let pageResponse
 
-      if (isMainnet === 'true') {
+      if (isMainnet) {
         console.log('Going to Opensea...')
         pageResponse = await page.goto(
           `https://opensea.io/assets/${
