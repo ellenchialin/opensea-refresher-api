@@ -82,9 +82,10 @@ export default async function handler(req, res) {
           )
       }
 
-      await page.waitForSelector('[value="refresh"]')
-      // await page.click('[value="refresh"]')
-      const title = await page.title()
+      // await page.waitForSelector('[value="refresh"]')
+
+      await page.click('[value="refresh"]')
+      // const title = await page.title()
 
       console.log(`Token ${tokenId} finished and ready to close browser...`)
       browser.close()
