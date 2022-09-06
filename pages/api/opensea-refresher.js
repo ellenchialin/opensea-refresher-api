@@ -82,7 +82,7 @@ export default async function handler(req, res) {
           )
       }
 
-      // await page.waitForSelector('[value="refresh"]');
+      await page.waitForSelector('[value="refresh"]')
       // await page.click('[value="refresh"]')
       const title = await page.title()
 
