@@ -78,14 +78,17 @@ export default async function handler(req, res) {
         return res
           .status(404)
           .send(
-            'The NFT page does not exist. Please check contract address and token Id.'
+            'The NFT page does not exist. Please check form fields are correct.'
           )
       }
 
       // await page.waitForSelector('[value="refresh"]')
 
-      await page.click('[value="refresh"]')
+      // await page.click('[value="refresh"]')
       const title = await page.title()
+      // await page.screenshot({
+      //   path: 'screenshot.jpg'
+      // })
 
       console.log(`Token ${tokenId} finished and ready to close browser...`)
       browser.close()
